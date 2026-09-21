@@ -232,6 +232,12 @@
       gap: 18px;
     }
 
+    .shape-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
     .card {
       padding: 24px;
       border: 1px solid var(--line);
@@ -284,6 +290,12 @@
       font-size: 14px;
     }
 
+    @media (max-width: 1100px) and (min-width: 821px) {
+      .shape-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
     @media (max-width: 820px) {
       .hero {
         grid-template-columns: 1fr;
@@ -297,6 +309,10 @@
       }
 
       .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .shape-grid {
         grid-template-columns: 1fr;
       }
 
@@ -448,10 +464,12 @@
         visualization style.
       </p>
 
-      <div class="grid">
+      <div class="shape-grid">
 
         <div class="card">
-          <div class="shape">▮</div>
+          <div class="shape">
+            <img src="./3D_Quadrangular_prism.png" alt="Rectangular Prism chart example">
+          </div>
           <h3>Rectangular Prism</h3>
           <p>
             A traditional 3D bar-style representation suitable for
@@ -460,16 +478,20 @@
         </div>
 
         <div class="card">
-          <div class="shape">●</div>
+          <div class="shape">
+            <img src="./3D_Cylinder.png" alt="Cylinder chart example">
+          </div>
           <h3>Cylinder</h3>
           <p>
-            A softer alternative to rectangular bars with a smooth 3D
-            appearance.
+            A softer alternative to rectangular bars with a smooth
+            3D appearance.
           </p>
         </div>
 
         <div class="card">
-          <div class="shape">▲</div>
+          <div class="shape">
+            <img src="./3D_Cone.png" alt="Cone chart example">
+          </div>
           <h3>Cone</h3>
           <p>
             Useful for more dynamic and presentation-oriented
@@ -478,7 +500,9 @@
         </div>
 
         <div class="card">
-          <div class="shape">●│</div>
+          <div class="shape">
+            <img src="./3D_Sphere_Lollipop.png" alt="Sphere and Lollipop chart example">
+          </div>
           <h3>Sphere / Lollipop</h3>
           <p>
             A spherical marker with a vertical stem, especially effective
