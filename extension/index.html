@@ -1,1 +1,189 @@
-
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>3D Chart Viz</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="lib/tableau.extensions.1.latest.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <main id="app">
+    <header class="toolbar main-header">
+      <div class="title-block">
+        <strong>3D Chart Viz · v1.8.15 Public Preview</strong>
+        <span id="status">Waiting for connection</span>
+      </div>
+      <button id="toggle-pages" type="button" aria-controls="pages" aria-expanded="true">Hide playback</button>
+      <button id="toggle-settings" type="button" aria-controls="settings-panel" aria-expanded="true">⚙ Close settings</button>
+    </header>
+    <div id="header-recovery" class="header-recovery" hidden aria-label="Hidden header controls">
+      <button id="header-mini-pages" type="button" title="Show/hide playback" aria-label="Show/hide playback">▶</button>
+      <button id="header-mini-settings" type="button" title="Open settings" aria-label="Open settings">⚙</button>
+    </div>
+    <div id="workspace" class="workspace" data-settings-side="right">
+    <section id="settings-panel" aria-label="Chart settings">
+    <div class="settings-panel-header">
+      <button id="settings-drag-handle" class="settings-drag-handle" type="button" title="Drag left or right to move the settings panel" aria-label="Move settings panel left or right">⠿ Display settings</button>
+      <button id="settings-dock" type="button" title="Move settings panel to the other side">⇤ Move left</button>
+      <button id="settings-close" type="button" title="Close settings panel" aria-label="Close settings panel">×</button>
+    </div>
+    <div class="toolbar">
+      <label>Reference value <select id="reference-source"><option value="off">Off</option><option value="fixed">Fixed value</option></select></label>
+      <label>Fixed value <input id="reference-fixed" type="number" step="any" value="100" style="width:90px"></label>
+      <label>Condition <select id="reference-op"><option value="gt">Greater than</option><option value="ge">Greater than or equal to</option><option value="lt">Less than</option><option value="le">Less than or equal to</option></select></label>
+      <label>Match style <select id="reference-style"><option value="intensity" selected>Bar intensity (recommended)</option><option value="outline">Outline</option><option value="glow">Outline + glow</option><option value="fill">Change fill color</option><option value="line-only">Reference line only</option></select></label>
+      <label>Non-match lightness <input id="reference-lighten" type="range" min="15" max="80" step="5" value="55"><output id="reference-lighten-value">55%</output></label>
+      <label>Highlight color <input id="reference-color" type="color" value="#dc2626"></label>
+      <label>Outline width <input id="reference-width" type="number" min="1" max="8" step="0.5" value="3"></label>
+      <label><input id="reference-lines" type="checkbox" checked>Show reference line</label>
+      <label>Line color <input id="reference-line-color" type="color" value="#9333ea"></label>
+      <span id="reference-note"></span>
+    </div>
+    <div class="toolbar">
+      <label>Shape <select id="shape"><option value="bar">Rectangular Prism</option><option value="cylinder">Cylinder</option><option value="cone">Cone</option><option value="sphere">Sphere (Lollipop)</option><option value="snack">Snack Stick</option></select></label><label>Pattern
+        <select id="pattern">
+          <option value="solid">Solid</option>
+          <option value="stripes">Stripes</option>
+          <option value="dots">Dots</option>
+          <option value="mesh">Mesh</option>
+        </select>
+      </label>
+      <label>Color by <select id="color-field" title="Add another dimension to Detail to select it here"><option value="">Auto (Z)</option></select></label>
+      <label>Palette
+        <select id="palette">
+          <option value="tableau">Tableau</option>
+          <option value="ocean">Ocean</option>
+          <option value="sunset">Sunset</option>
+          <option value="mono">Mono</option>
+        </select>
+      </label>
+      <label>Wall guides <select id="guides"><option value="none">Hidden</option><option value="hover" selected>On hover</option><option value="all">All</option></select></label>
+      <label class="check"><input id="labels" type="checkbox" checked>Show values</label>
+      <label>Transparency <input id="transparency" type="range" min="0" max="90" value="0" step="5"><output id="transparency-value">0%</output></label>
+      <label><input id="stem-show" type="checkbox" checked>Sphere stem</label>
+      <label>Stem line <select id="stem-style"><option value="solid" selected>Solid</option><option value="dash">Dashed</option><option value="dot">Dotted</option></select></label>
+      <label>Stem color <select id="stem-color-mode"><option value="mark" selected>Match sphere</option><option value="fixed">Fixed color</option></select></label>
+      <label>Fixed color <input id="stem-color" type="color" value="#315b71"></label>
+      <label>Width <input id="stem-width" type="number" min="0.5" max="6" step="0.5" value="2"></label>
+      <label>Opacity <input id="stem-opacity" type="range" min="10" max="100" value="75" step="5"><output id="stem-opacity-value">75%</output></label>
+      <label><input id="stem-history" type="checkbox">Show stems in history</label>
+      <button id="clear-highlight" type="button">Clear highlight</button>
+      <button id="demo" type="button" title="Preview sample outside Tableau">Sample</button>
+    </div>
+    <div class="toolbar">
+      <label>Mark width <select id="mark-width-mode"><option value="auto" selected>Auto</option><option value="fixed">Fixed</option><option value="field">Field</option></select></label>
+      <label>Fixed width <input id="width-fixed" type="range" min="20" max="100" step="5" value="75"><output id="width-fixed-value">75%</output></label>
+      <label>Width field <select id="width-field" title="Add a numeric field to Detail to select it here"><option value="">Select a field</option></select></label>
+      <label>Minimum width <input id="width-min" type="range" min="15" max="90" step="5" value="30"><output id="width-min-value">30%</output></label>
+      <label>Maximum width <input id="width-max" type="range" min="20" max="100" step="5" value="100"><output id="width-max-value">100%</output></label>
+      <span id="width-note">Width: Auto</span>
+    </div>
+    <div class="toolbar">
+      <label>Mark depth <select id="mark-depth-mode"><option value="auto" selected>Auto</option><option value="fixed">Fixed</option><option value="field">Field</option></select></label>
+      <label>Fixed depth <input id="depth-fixed" type="range" min="20" max="100" step="5" value="55"><output id="depth-fixed-value">55%</output></label>
+      <label>Depth field <select id="depth-field" title="Add a numeric field to Detail to select it here"><option value="">Select a field</option></select></label>
+      <label>Minimum depth <input id="depth-min" type="range" min="15" max="90" step="5" value="30"><output id="depth-min-value">30%</output></label>
+      <label>Maximum depth <input id="depth-max" type="range" min="20" max="100" step="5" value="100"><output id="depth-max-value">100%</output></label>
+      <span id="depth-note">Depth: Auto</span>
+    </div>
+    <div class="toolbar">
+      <label>Stacking <select id="stack-mode"><option value="none" selected>None</option><option value="color">Stack by color series</option></select></label>
+      <label>Stack order <select id="stack-order"><option value="legend">Legend order</option><option value="value-desc">Value descending</option><option value="value-asc">Value ascending</option></select></label>
+      <label>Labels <select id="stack-label"><option value="segment">Each segment</option><option value="total">Total only</option><option value="both">Segments + total</option><option value="none">Hidden</option></select></label>
+      <span id="stack-note">Available for Rectangular Prism and Cylinder</span>
+    </div>
+    <details class="appearance"><summary>Snack Stick settings</summary><div class="toolbar">
+      <label id="snack-style-control">Snack Style <select id="snack-style"><option value="classic" selected>Classic</option><option value="thick-choco">Thick Choco</option><option value="crunch">Crunch</option></select></label>
+      <label>Profile <select id="snack-profile"><option value="round" selected>Round (cylinder)</option><option value="square">Square (prism)</option></select></label>
+      <label>Chocolate color <select id="snack-chocolate-mode"><option value="fixed" selected>Fixed color</option><option value="series">Series color</option></select></label>
+      <label>Coating Color <input id="snack-chocolate-color" type="color" value="#5b2d1f"></label>
+      <label>Biscuit Color <input id="snack-biscuit-color" type="color" value="#d6a45f"></label>
+      <label>Coating Ratio <input id="snack-chocolate-ratio" type="range" min="70" max="95" step="5" value="85"><output id="snack-chocolate-ratio-value">85%</output></label>
+      <label>Width adjustment <input id="snack-width" type="range" min="35" max="90" step="5" value="65"><output id="snack-width-value">65%</output></label>
+      <label>Coating Thickness <input id="snack-coating-thickness" type="range" min="100" max="150" step="5" value="125"><output id="snack-coating-thickness-value">125%</output></label>
+      <label>Crunch Intensity <input id="snack-crunch-intensity" type="range" min="0" max="100" step="10" value="50"><output id="snack-crunch-intensity-value">50%</output></label>
+      <label>Gloss / shading <input id="snack-gloss" type="range" min="0" max="100" step="10" value="70"><output id="snack-gloss-value">70%</output></label>
+      <span id="snack-note">Available when Snack Stick is selected</span>
+    </div></details>
+    <details class="appearance"><summary>Y-value table calculation</summary><div class="toolbar">
+      <label>Calculation <select id="table-calc"><option value="none">None (original value)</option><option value="running-total">Running total</option><option value="moving-average">Moving average</option></select></label>
+      <label>Calculation direction <select id="calc-direction"><option value="x">X-axis order</option><option value="page">Page order</option></select></label>
+      <label>Partition <select id="calc-partition"><option value="z-color">Z + color series</option><option value="z">By Z</option><option value="color">By color</option><option value="all">All</option></select></label>
+      <label>Moving average window <input id="calc-window" type="number" min="1" max="120" value="3"></label>
+      <span id="calc-note"></span>
+    </div></details>
+    <details class="appearance"><summary>Linear trend line</summary><div class="toolbar">
+      <label><input id="trend-show" type="checkbox">Show trend line</label>
+      <label>X interpretation <select id="trend-x-mode"><option value="auto">Auto (prefer numeric/date)</option><option value="order">Displayed X order</option></select></label>
+      <label>Partition <select id="trend-partition"><option value="z-color">Z + color series</option><option value="z">By Z</option><option value="color">By color</option><option value="all">All</option></select></label>
+      <label>Line color <select id="trend-color-mode"><option value="series">Series color</option><option value="fixed">Fixed color</option></select></label>
+      <label>Fixed color <input id="trend-color" type="color" value="#7c3aed"></label>
+      <label>Line <select id="trend-style"><option value="solid">Solid</option><option value="dash" selected>Dashed</option><option value="dot">Dotted</option></select></label>
+      <label>Width <input id="trend-width" type="number" min="0.5" max="8" step="0.5" value="2.5"></label>
+      <label><input id="trend-stats" type="checkbox" checked>Show slope / R²</label>
+      <span id="trend-note"></span><span id="trend-summary"></span>
+    </div></details>
+    <details class="appearance"><summary>Layout / legend</summary><div class="toolbar">
+      <label>Top margin <input id="layout-top" type="number" min="8" max="120" value="24"></label>
+      <label>Bottom margin <input id="layout-bottom" type="number" min="30" max="200" value="54"></label>
+      <label>Left margin <input id="layout-left" type="number" min="54" max="220" value="82"></label>
+      <label>Right margin <input id="layout-right" type="number" min="24" max="220" value="48"></label>
+      <label>Legend <select id="legend-position"><option value="inside-right" selected>Inside · upper right</option><option value="inside-left">Inside · upper left</option><option value="outside-right">Outside · right</option><option value="hidden">Hidden</option></select></label>
+      <label>Legend X offset <input id="legend-x" type="number" min="-200" max="200" value="0"></label>
+      <label>Legend Y offset <input id="legend-y" type="number" min="-200" max="200" value="0"></label>
+      <button id="layout-reset" type="button">Reset to compact</button>
+    </div><p>Margins and legend offsets are in pixels. Placing the legend inside expands the chart area by avoiding reserved space on the right.</p></details>
+    <details class="appearance"><summary>Axes and ordering</summary><div class="toolbar"><label>X title position <select id="x-title-pos"><option value="end">End</option><option value="center">Center</option><option value="start">Start</option><option value="hidden">Hidden</option></select></label><label>X title X offset <input id="x-title-x" type="number" min="-80" max="80" value="0"></label><label>X title Y offset <input id="x-title-y" type="number" min="-80" max="80" value="0"></label><label>X labels/ticks X offset <input id="x-tick-x" type="number" min="-80" max="80" value="0"></label><label>X labels/ticks Y offset <input id="x-tick-y" type="number" min="-80" max="80" value="0"></label><label>X label angle <input id="x-angle" type="number" min="-90" max="90" value="0"></label><label>X sort order <select id="x-sort"><option value="source">Source order</option><option value="asc">Name ascending</option><option value="desc">Name descending</option><option value="value-asc">Total value ascending</option><option value="value-desc">Total value descending</option><option value="manual">Manual order</option></select></label><select id="x-member" aria-label="X item to move"></select><button id="x-up">Move earlier</button><button id="x-down">Move later</button><label>Y title position <select id="y-title-pos"><option value="end">End</option><option value="center">Center</option><option value="start">Start</option><option value="hidden">Hidden</option></select></label><label>Y title X offset <input id="y-title-x" type="number" min="-80" max="80" value="0"></label><label>Y title Y offset <input id="y-title-y" type="number" min="-80" max="80" value="0"></label><label>Y labels/ticks X offset <input id="y-tick-x" type="number" min="-80" max="80" value="0"></label><label>Y labels/ticks Y offset <input id="y-tick-y" type="number" min="-80" max="80" value="0"></label><label>Y label angle <input id="y-angle" type="number" min="-90" max="90" value="0"></label><label>Z title position <select id="z-title-pos"><option value="end">End</option><option value="center">Center</option><option value="start">Start</option><option value="hidden">Hidden</option></select></label><label>Z title X offset <input id="z-title-x" type="number" min="-80" max="80" value="0"></label><label>Z title Y offset <input id="z-title-y" type="number" min="-80" max="80" value="0"></label><label>Z labels/ticks X offset <input id="z-tick-x" type="number" min="-80" max="80" value="0"></label><label>Z labels/ticks Y offset <input id="z-tick-y" type="number" min="-80" max="80" value="0"></label><label>Z label angle <input id="z-angle" type="number" min="-90" max="90" value="0"></label><label>Z sort order <select id="z-sort"><option value="source">Source order</option><option value="asc">Name ascending</option><option value="desc">Name descending</option><option value="value-asc">Total value ascending</option><option value="value-desc">Total value descending</option><option value="manual">Manual order</option></select></label><select id="z-member" aria-label="Z item to move"></select><button id="z-up">Move earlier</button><button id="z-down">Move later</button></div><p>Offsets are in pixels. For manual order, select an item and move it earlier or later. Value-based order is fixed using totals across all pages.</p></details><details class="appearance"><summary>Planes and grid lines</summary><div class="toolbar"><label>Plane color (all 3 planes)<input id="plane-color" type="color" value="#eaf3f7"></label><label>Plane grid lines <select id="grid-style"><option value="solid">Solid</option><option value="dash" >Dashed</option><option value="dot">Dotted</option><option value="none">Hidden</option></select></label><label>Color <input id="grid-color" type="color" value="#88a9bb"></label><label>Width <input id="grid-width" type="number" min="0.5" max="4" step="0.5" value="1"></label><label>Mark-to-wall guides <select id="guide-style"><option value="solid">Solid</option><option value="dash" selected>Dashed</option><option value="dot">Dotted</option><option value="none">Hidden</option></select></label><label>Color <input id="guide-color" type="color" value="#88a9bb"></label><label>Width <input id="guide-width" type="number" min="0.5" max="4" step="0.5" value="1"></label></div></details><details id="filter-panel"><summary>Filters (this extension only)</summary><button id="reset-filters" type="button">Reset to all selected</button><div id="filter-options"></div></details>
+    <details class="appearance"><summary>Axes and frame lines</summary><div class="toolbar">
+      <label>X / Y / Z axis lines <select id="axis-line-mode"><option value="visible" selected>Visible</option><option value="hidden">Hidden</option></select></label>
+      <label>Axis line color <input id="axis-line-color" type="color" value="#165f83"></label>
+      <label>Axis line width <input id="axis-line-width" type="number" min="0.5" max="6" step="0.5" value="1.5"></label>
+      <label>3D frame lines <select id="frame-line-mode"><option value="visible" selected>Visible</option><option value="hidden">Hidden</option></select></label>
+      <label>Frame line color <input id="frame-line-color" type="color" value="#99bccc"></label>
+      <label>Frame line width <input id="frame-line-width" type="number" min="0.5" max="6" step="0.5" value="1"></label>
+    </div><p>Axis lines are the X, Y, and Z reference axes. Frame lines outline the back, side, zero plane, and lower plane for negative values. Configure lines within planes under “Planes and grid lines.”</p></details>
+    <details class="appearance"><summary>Background and display settings</summary><div class="toolbar">
+      <label>Top header <select id="header-mode"><option value="full" selected>Visible</option><option value="compact">Compact</option><option value="hidden">Hidden</option></select></label>
+      <label>Extension background <select id="background-mode"><option value="solid" selected>Solid background</option><option value="chart-transparent">Chart area transparent</option><option value="all-transparent">Transparent including header</option></select></label>
+      <label>Background color <input id="background-color" type="color" value="#f7fafc"></label>
+      <label>Background opacity <input id="background-opacity" type="range" min="10" max="100" step="5" value="100"><output id="background-opacity-value">100%</output></label>
+      <label>Label halo <select id="label-halo"><option value="white" selected>White</option><option value="black">Black</option><option value="none">None</option></select></label>
+      <label>Planes <select id="plane-mode"><option value="color" selected>Colored</option><option value="transparent">Transparent (keep grid lines)</option></select></label>
+      <label>Lower plane for negative values <select id="negative-floor-mode"><option value="surface" selected>Plane + grid lines</option><option value="grid">Grid lines only</option><option value="none">Hidden</option></select></label>
+      <label>Axes after filtering <select id="filter-axis-mode"><option value="keep" selected>Keep names and positions</option><option value="compact">Hide and compact</option></select></label>
+    </div><p>To show an image behind the extension, set both “Extension background” and “Planes” to transparent. The settings panel remains white for readability.</p></details>
+    </section>
+    <div id="settings-resizer" role="separator" aria-orientation="vertical" aria-label="Resize settings panel" tabindex="0" title="Drag to resize the settings panel. Double-click to restore the default width."></div>
+    <div id="content-column" class="content-column">
+    <section id="pages" class="page-toolbar" aria-label="Page playback" data-playback-ui="simple">
+      <span id="page-hint">Add a field to Page on the Marks card to enable playback.</span>
+      <button id="page-prev" type="button">◀ Previous</button>
+      <button id="page-play" type="button">▶ Play</button>
+      <button id="page-next" type="button">Next ▶</button>
+      <select id="page-select" aria-label="Displayed page"></select>
+      <label class="page-advanced">Order <select id="page-order"><option value="asc">Ascending</option><option value="desc">Descending</option></select></label>
+      <input class="page-advanced" id="page-slider" type="range" min="0" max="0" value="0" step="1" aria-label="Page position">
+      <output class="page-advanced" id="page-position"></output>
+      <label>Interval <select id="page-speed"><option value="250">0.25 sec</option><option value="500">0.5 sec</option><option value="1000" selected>1 sec</option><option value="2000">2 sec</option></select></label>
+      <label><input id="page-loop" type="checkbox" checked>Loop</label>
+      <label class="page-advanced">History <select id="history-mode"><option value="none">None</option><option value="recent">Recent</option><option value="all">All</option></select></label>
+      <label class="page-advanced">History Count <input id="history-count" type="number" min="1" max="50" value="3"></label>
+      <label class="page-advanced">History Opacity <input id="history-opacity" type="range" min="5" max="80" value="25" step="5"><output id="history-opacity-value">25%</output></label>
+      <label class="page-advanced"><input id="history-fade" type="checkbox" checked>Fade Older History</label>
+      <label class="page-advanced"><input id="trajectory-show" type="checkbox">Trail</label>
+      <label class="page-advanced"><input id="trajectory-break-wrap" type="checkbox" checked>Break at X Wrap</label>
+      <label class="page-advanced">Line <select id="trajectory-style"><option value="solid">Solid</option><option value="dash" selected>Dashed</option><option value="dot">Dotted</option></select></label>
+      <label class="page-advanced">Trail Color <input id="trajectory-color" type="color" value="#7c3aed"></label>
+      <label class="page-advanced">Width <input id="trajectory-width" type="number" min="0.5" max="6" step="0.5" value="2"></label>
+      <button id="page-ui-toggle" class="page-ui-toggle" type="button" aria-pressed="false" title="Show advanced playback settings">Advanced</button>
+    </section>
+    <section id="message" class="message" hidden></section>
+    <section id="chart" aria-label="3D chart"></section>
+    <div id="tooltip" role="tooltip" hidden></div>
+    </div>
+    </div>
+  </main>
+</body>
+</html>
